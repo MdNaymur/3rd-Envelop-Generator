@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Envelope & Excel Generator</title>
+    <style>
+        /* ====== Global ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #f0f4f8;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #1e3a5f;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #555;
+            margin-bottom: 18px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        /* ====== Upload Section ====== */
+        .upload-section {
+            background: white;
+            border-radius: 14px;
+            padding: 18px 22px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.07);
+            max-width: 950px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .upload-section input[type="file"] { display: none; }
+        .upload-btn {
+            display: inline-block;
+            background: #1e3a5f;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background 0.2s;
+            border: none;
+        }
+        .upload-btn:hover { background: #14304e; }
+        .file-name {
+            margin-top: 8px;
+            color: #2e7d32;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* ====== Action Buttons ====== */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: white;
+            border-radius: 14px;
+            padding: 14px 20px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.07);
+            max-width: 950px;
+            width: 100%;
+            margin-bottom: 18px;
+            align-items: center;
+            justify-content: center;
+        }
+        .action-buttons button {
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+        .btn-envelope {
+            background: #1e3a5f;
+            color: white;
+        }
+        .btn-envelope:hover {
+            background: #14304e;
+        }
+        .btn-excel {
+            background: #1e7e34;
+            color: white;
+        }
+        .btn-excel:hover {
+            background: #15692a;
+        }
+        .btn-excel:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        /* ====== Customization Panel ====== */
+        .custom-panel {
+            background: white;
+            border-radius: 14px;
+            padding: 16px 20px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.07);
+            max-width: 950px;
+            width: 100%;
+            margin-bottom: 18px;
+            display: none;
+        }
+        .custom-panel h3 {
+            color: #1e3a5f;
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .custom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 18px;
+        }
+        .custom-grid label {
+            font-weight: 500;
+            color: #1e3a5f;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .custom-grid input[type="text"] {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+            font-family: inherit;
+            width: 100%;
+        }
+        .custom-grid .full-width { grid-column: 1 / -1; }
+
+        .font-control-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 2px;
+        }
+        .font-control-row .size-display {
+            font-weight: 700;
+            color: #1e3a5f;
+            min-width: 40px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .font-control-row .arrow-btn {
+            background: #e8edf4;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 2px 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3a5f;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .font-control-row .arrow-btn:hover {
+            background: #d0dae8;
+        }
+        .font-control-row .bold-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #555;
+            margin-left: 5px;
+        }
+        .font-control-row .bold-toggle input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1e3a5f;
+        }
+
+        .logo-upload-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .logo-upload-area input[type="file"] { display: none; }
+        .logo-upload-btn {
+            background: #e8edf4;
+            padding: 5px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            border: 1px dashed #1e3a5f;
+            color: #1e3a5f;
+            transition: background 0.2s;
+        }
+        .logo-upload-btn:hover { background: #d0dae8; }
+        .logo-preview {
+            height: 50px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            object-fit: contain;
+            background: #fafafa;
+            display: none;
+        }
+        .logo-preview.show { display: block; }
+        .logo-size-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 5px;
+        }
+        .logo-size-control .size-display {
+            font-weight: 700;
+            color: #1e3a5f;
+            min-width: 35px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .logo-size-control .arrow-btn {
+            background: #e8edf4;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 1px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a5f;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .logo-size-control .arrow-btn:hover {
+            background: #d0dae8;
+        }
+        .logo-remove-btn {
+            background: #e8edf4;
+            padding: 5px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            border: 1px solid #d32f2f;
+            color: #d32f2f;
+            transition: background 0.2s;
+            display: none;
+        }
+        .logo-remove-btn:hover { background: #fdd; }
+
+        /* ====== Filters ====== */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: white;
+            border-radius: 14px;
+            padding: 12px 18px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.07);
+            max-width: 950px;
+            width: 100%;
+            margin-bottom: 18px;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        .filters label {
+            font-weight: 500;
+            color: #1e3a5f;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 13px;
+        }
+        .filters select {
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+            min-width: 110px;
+            background: white;
+        }
+        .filters button {
+            background: #0d6efd;
+            color: white;
+            border: none;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .filters button:hover { background: #0b5ed7; }
+
+        /* ====== Preview Grid ====== */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* ====== ENVELOPE CARD ====== */
+        .envelope-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            border: 1px solid #e9edf2;
+        }
+        .envelope-header {
+            background: #1e3a5f;
+            color: white;
+            padding: 6px 14px;
+            font-weight: 600;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .envelope-header .badge {
+            background: #ffc107;
+            color: #1e3a5f;
+            padding: 1px 10px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .envelope-body {
+            padding: 14px 18px 12px;
+        }
+
+        /* ====== PORTRAIT A4 PAGE ====== */
+        .envelope-body .a4-page {
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            padding: 10mm 12mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 3px double #000;
+            min-height: 70px;
+        }
+        .header-row .logo-left {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+        .header-row .logo-left .logo-img {
+            display: inline-block;
+        }
+        .header-row .logo-left .logo-img img {
+            display: block;
+            object-fit: contain;
+        }
+        .header-row .header-text {
+            flex: 1;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 4px;
+        }
+        .header-row .header-text .cline {
+            color: #000;
+            padding: 1px 0;
+            letter-spacing: 0.3px;
+            line-height: 1.3;
+        }
+
+        .envelope-type-box {
+            border: 3px solid #000;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 4px 0 10px 0;
+            text-align: center;
+            font-weight: 800;
+            font-size: 20px;
+            color: #000;
+            background: #f5f5f5;
+            letter-spacing: 1px;
+        }
+
+        .data-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .data-item {
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 6px 12px;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .data-item .dlabel {
+            font-weight: 700;
+            color: #000;
+            font-size: 15px;
+            white-space: nowrap;
+            min-width: 100px;
+        }
+        .data-item .dvalue {
+            font-weight: 700;
+            color: #000;
+            font-size: 15px;
+            word-break: break-word;
+        }
+
+        .invigilator-section {
+            margin-top: 10px;
+            border-top: 2px solid #000;
+            padding-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .invigilator-item {
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 6px 12px;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .invigilator-item .ilabel {
+            font-weight: 700;
+            color: #000;
+            font-size: 15px;
+            white-space: nowrap;
+            min-width: 100px;
+        }
+        .invigilator-item .ivalue {
+            font-weight: 400;
+            color: #000;
+            font-size: 15px;
+            word-break: break-word;
+            min-width: 80px;
+            border-bottom: 1px solid #999;
+            padding: 0 8px;
+        }
+
+        .signature-area-qp {
+            margin-top: 10px;
+            border-top: 2px solid #000;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #000;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .signature-area-qp .sig-label {
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 2px;
+        }
+        .signature-area-qp .sig-space {
+            min-height: 60px;
+            padding: 4px 0;
+        }
+        .signature-area-qp .sig-note {
+            font-weight: 400;
+            font-size: 13px;
+            color: #555;
+            margin-top: 2px;
+        }
+
+        .empty-msg {
+            color: #999;
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 16px;
+            grid-column: 1 / -1;
+        }
+        .print-btn {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .print-btn:hover { background: #1e5a22; }
+        .footer-note {
+            margin-top: 22px;
+            color: #777;
+            font-size: 13px;
+            text-align: center;
+            max-width: 700px;
+        }
+
+        @media (max-width: 700px) {
+            .custom-grid { grid-template-columns: 1fr; }
+            .custom-grid .full-width { grid-column: 1; }
+            .filters { flex-direction: column; align-items: stretch; }
+            .upload-section { padding: 12px; }
+            .data-item { flex-wrap: wrap; padding: 5px 8px; }
+            .data-item .dlabel { min-width: 70px; font-size: 13px; }
+            .data-item .dvalue { font-size: 13px; }
+            .invigilator-item { flex-wrap: wrap; padding: 5px 8px; }
+            .invigilator-item .ilabel { min-width: 70px; font-size: 13px; }
+            .invigilator-item .ivalue { font-size: 13px; }
+            .envelope-body .a4-page { padding: 5mm; min-height: auto; }
+            .envelope-type-box { font-size: 16px; padding: 5px 8px; }
+            .preview-grid { grid-template-columns: 1fr; }
+            .font-control-row { flex-wrap: wrap; }
+            .signature-area-qp .sig-space { min-height: 40px; }
+            .header-row { flex-wrap: wrap; gap: 4px; }
+            .header-row .header-text { text-align: center; }
+            .action-buttons { flex-direction: column; }
+            .action-buttons button { width: 100%; }
+        }
+
+        /* ============================================================ */
+        /* ====== PRINT - ENVELOPE PORTRAIT ====== */
+        /* ============================================================ */
+        @media print {
+            @page {
+                size: portrait;
+                margin: 8mm 10mm;
+            }
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .upload-section, .filters, .footer-note, .no-print,
+            .custom-panel, h1, .subtitle, .envelope-header,
+            .action-buttons {
+                display: none !important;
+            }
+            .preview-grid {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            .envelope-card {
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                page-break-after: always;
+                break-after: page;
+            }
+            .envelope-card:last-child {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            .envelope-body { padding: 0 !important; margin: 0 !important; }
+            .envelope-body .a4-page {
+                max-width: 100% !important;
+                min-height: 100vh !important;
+                height: auto !important;
+                padding: 12mm 14mm !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                background: white !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                position: relative !important;
+            }
+            .header-row {
+                display: flex !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+                margin-bottom: 6px !important;
+                padding-bottom: 6px !important;
+                border-bottom: 3px double #000 !important;
+                min-height: 70px !important;
+            }
+            .header-row .logo-left {
+                flex-shrink: 0 !important;
+            }
+            .header-row .header-text {
+                flex: 1 !important;
+                text-align: left !important;
+                padding-left: 4px !important;
+            }
+            .header-row .header-text .cline {
+                padding: 2px 0 !important;
+                line-height: 1.3 !important;
+            }
+            .envelope-type-box {
+                font-size: 24px !important;
+                padding: 10px 14px !important;
+                border-width: 4px !important;
+            }
+            .data-item {
+                padding: 8px 14px !important;
+                border-width: 2.5px !important;
+            }
+            .data-item .dlabel {
+                font-size: 17px !important;
+                min-width: 110px !important;
+            }
+            .data-item .dvalue {
+                font-size: 17px !important;
+            }
+            .data-grid { gap: 6px !important; }
+            .invigilator-item {
+                padding: 8px 14px !important;
+                border-width: 2.5px !important;
+            }
+            .invigilator-item .ilabel {
+                font-size: 17px !important;
+                min-width: 110px !important;
+            }
+            .invigilator-item .ivalue {
+                font-size: 17px !important;
+            }
+            .invigilator-section { gap: 6px !important; }
+            .signature-area-qp .sig-space {
+                min-height: 80px !important;
+            }
+            .signature-area-qp .sig-label {
+                font-size: 17px !important;
+            }
+            .signature-area-qp .sig-note {
+                font-size: 15px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📨 Envelope & Excel Generator</h1>
+    <p class="subtitle">Upload Excel → Generate Envelopes or Download Excel Summary</p>
+
+    <!-- Upload -->
+    <div class="upload-section">
+        <label class="upload-btn" for="fileInput">📂 Upload Excel File (.xlsx / .xls)</label>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" />
+        <div class="file-name" id="fileName"></div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" id="actionButtons" style="display:none;">
+        <button class="btn-envelope" id="btnEnvelope">📨 Generate Envelopes</button>
+        <button class="btn-excel" id="btnExcel">📊 Download Excel Summary</button>
+    </div>
+
+    <!-- Customization Panel -->
+    <div class="custom-panel" id="customPanel" style="display:none;">
+        <h3>⚙️ Customization</h3>
+        <div class="custom-grid">
+            <label class="full-width">
+                <span>📝 Line 1</span>
+                <input type="text" id="headerLine1" value="Uttara University" />
+                <div class="font-control-row">
+                    <span class="size-display" id="fsLabel1">22px</span>
+                    <button class="arrow-btn" data-target="fsLine1" data-dir="down">−</button>
+                    <button class="arrow-btn" data-target="fsLine1" data-dir="up">+</button>
+                    <input type="hidden" id="fsLine1" value="22" />
+                    <label class="bold-toggle">
+                        <input type="checkbox" class="bold-check" data-line="1" checked />
+                        Bold
+                    </label>
+                </div>
+            </label>
+
+            <label class="full-width">
+                <span>📝 Line 2</span>
+                <input type="text" id="headerLine2" value="Department of Electrical and Electronic Engineering" />
+                <div class="font-control-row">
+                    <span class="size-display" id="fsLabel2">20px</span>
+                    <button class="arrow-btn" data-target="fsLine2" data-dir="down">−</button>
+                    <button class="arrow-btn" data-target="fsLine2" data-dir="up">+</button>
+                    <input type="hidden" id="fsLine2" value="20" />
+                    <label class="bold-toggle">
+                        <input type="checkbox" class="bold-check" data-line="2" checked />
+                        Bold
+                    </label>
+                </div>
+            </label>
+
+            <label class="full-width">
+                <span>📝 Line 3</span>
+                <input type="text" id="headerLine3" value="Summer 2026 Examination" />
+                <div class="font-control-row">
+                    <span class="size-display" id="fsLabel3">20px</span>
+                    <button class="arrow-btn" data-target="fsLine3" data-dir="down">−</button>
+                    <button class="arrow-btn" data-target="fsLine3" data-dir="up">+</button>
+                    <input type="hidden" id="fsLine3" value="20" />
+                    <label class="bold-toggle">
+                        <input type="checkbox" class="bold-check" data-line="3" checked />
+                        Bold
+                    </label>
+                </div>
+            </label>
+
+            <label class="full-width">
+                <span>📝 Line 4</span>
+                <input type="text" id="headerLine4" value="Confidential Document" />
+                <div class="font-control-row">
+                    <span class="size-display" id="fsLabel4">18px</span>
+                    <button class="arrow-btn" data-target="fsLine4" data-dir="down">−</button>
+                    <button class="arrow-btn" data-target="fsLine4" data-dir="up">+</button>
+                    <input type="hidden" id="fsLine4" value="18" />
+                    <label class="bold-toggle">
+                        <input type="checkbox" class="bold-check" data-line="4" checked />
+                        Bold
+                    </label>
+                </div>
+            </label>
+
+            <label class="full-width">
+                <span>📝 Line 5</span>
+                <input type="text" id="headerLine5" value="Envelope Cover Page" />
+                <div class="font-control-row">
+                    <span class="size-display" id="fsLabel5">18px</span>
+                    <button class="arrow-btn" data-target="fsLine5" data-dir="down">−</button>
+                    <button class="arrow-btn" data-target="fsLine5" data-dir="up">+</button>
+                    <input type="hidden" id="fsLine5" value="18" />
+                    <label class="bold-toggle">
+                        <input type="checkbox" class="bold-check" data-line="5" checked />
+                        Bold
+                    </label>
+                </div>
+            </label>
+
+            <label class="full-width">
+                <span>🖼️ Logo Upload & Size</span>
+                <div class="logo-upload-area">
+                    <label class="logo-upload-btn" for="logoInput">📤 Select Logo</label>
+                    <input type="file" id="logoInput" accept="image/*" />
+                    <img id="logoPreview" class="logo-preview" alt="Logo Preview" />
+                    <button id="removeLogoBtn" class="logo-remove-btn">✕ Remove</button>
+                    <div class="logo-size-control">
+                        <span class="size-display" id="logoSzLabel">60px</span>
+                        <button class="arrow-btn" id="logoSzDown">−</button>
+                        <button class="arrow-btn" id="logoSzUp">+</button>
+                        <input type="hidden" id="logoSzValue" value="60" />
+                    </div>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters" id="filterSection">
+        <label>Batch <select id="batchSelect"><option value="">— All —</option></select></label>
+        <label>Day / Eve <select id="sessionSelect"><option value="">All</option><option value="Day">Day</option><option value="Eve">Eve</option></select></label>
+        <label>Theory / Lab <select id="courseTypeSelect"><option value="">All</option><option value="Theory">Theory</option><option value="Lab">Lab</option></select></label>
+        <button id="generateBtn">🔄 Generate Envelopes</button>
+    </div>
+
+    <!-- Envelope Preview Grid -->
+    <div class="preview-grid" id="previewGrid">
+        <div class="empty-msg">⬆️ Upload Excel file above</div>
+    </div>
+
+    <div class="footer-note">
+        <strong>Note:</strong> Course Code last digit <strong>Even</strong> = Lab, <strong>Odd</strong> = Theory.<br>
+        <strong>Excel Download:</strong> Unique entries (no duplicates) with <strong>Room</strong> column included.
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        // ============================================================
+        // DATA
+        // ============================================================
+        let rawData = [], headers = [], uploadedLogo = null;
+        let allEnvelopes = [];
+
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const customPanel = document.getElementById('customPanel');
+        const filterSection = document.getElementById('filterSection');
+        const actionButtons = document.getElementById('actionButtons');
+        const batchSelect = document.getElementById('batchSelect');
+        const sessionSelect = document.getElementById('sessionSelect');
+        const courseTypeSelect = document.getElementById('courseTypeSelect');
+        const generateBtn = document.getElementById('generateBtn');
+        const previewGrid = document.getElementById('previewGrid');
+        const btnEnvelope = document.getElementById('btnEnvelope');
+        const btnExcel = document.getElementById('btnExcel');
+
+        const headerLine1 = document.getElementById('headerLine1');
+        const headerLine2 = document.getElementById('headerLine2');
+        const headerLine3 = document.getElementById('headerLine3');
+        const headerLine4 = document.getElementById('headerLine4');
+        const headerLine5 = document.getElementById('headerLine5');
+
+        const fsLine1 = document.getElementById('fsLine1');
+        const fsLine2 = document.getElementById('fsLine2');
+        const fsLine3 = document.getElementById('fsLine3');
+        const fsLine4 = document.getElementById('fsLine4');
+        const fsLine5 = document.getElementById('fsLine5');
+
+        const fsLabel1 = document.getElementById('fsLabel1');
+        const fsLabel2 = document.getElementById('fsLabel2');
+        const fsLabel3 = document.getElementById('fsLabel3');
+        const fsLabel4 = document.getElementById('fsLabel4');
+        const fsLabel5 = document.getElementById('fsLabel5');
+
+        const boldChecks = document.querySelectorAll('.bold-check');
+
+        const logoInput = document.getElementById('logoInput');
+        const logoPreview = document.getElementById('logoPreview');
+        const removeLogoBtn = document.getElementById('removeLogoBtn');
+        const logoSzValue = document.getElementById('logoSzValue');
+        const logoSzLabel = document.getElementById('logoSzLabel');
+        const logoSzUp = document.getElementById('logoSzUp');
+        const logoSzDown = document.getElementById('logoSzDown');
+
+        // ============================================================
+        // ARROW BUTTONS
+        // ============================================================
+        document.querySelectorAll('.arrow-btn[data-target]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.dataset.target;
+                const dir = this.dataset.dir;
+                const input = document.getElementById(targetId);
+                let val = parseInt(input.value) || 16;
+                if (dir === 'up') val += 1;
+                else if (dir === 'down') val -= 1;
+                if (val < 8) val = 8;
+                if (val > 48) val = 48;
+                input.value = val;
+                const labelId = targetId.replace('fsLine', 'fsLabel');
+                const label = document.getElementById(labelId);
+                if (label) label.textContent = val + 'px';
+                if (document.getElementById('previewGrid').children.length > 1) {
+                    generateEnvelopes();
+                }
+            });
+        });
+
+        logoSzUp.addEventListener('click', function() {
+            let val = parseInt(logoSzValue.value) || 60;
+            val += 4;
+            if (val > 150) val = 150;
+            logoSzValue.value = val;
+            logoSzLabel.textContent = val + 'px';
+            applyLogoSize();
+            if (document.getElementById('previewGrid').children.length > 1) {
+                generateEnvelopes();
+            }
+        });
+
+        logoSzDown.addEventListener('click', function() {
+            let val = parseInt(logoSzValue.value) || 60;
+            val -= 4;
+            if (val < 30) val = 30;
+            logoSzValue.value = val;
+            logoSzLabel.textContent = val + 'px';
+            applyLogoSize();
+            if (document.getElementById('previewGrid').children.length > 1) {
+                generateEnvelopes();
+            }
+        });
+
+        boldChecks.forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (document.getElementById('previewGrid').children.length > 1) {
+                    generateEnvelopes();
+                }
+            });
+        });
+
+        // ============================================================
+        // UTILITY
+        // ============================================================
+        function isTheory(code) {
+            if (!code) return true;
+            const last = code.trim().slice(-1);
+            const num = parseInt(last, 10);
+            if (isNaN(num)) return true;
+            return num % 2 !== 0;
+        }
+        function getCourseType(code) { return isTheory(code) ? 'Theory' : 'Lab'; }
+        function getSessionFromBatch(batch) {
+            if (!batch) return '';
+            const lower = batch.toLowerCase();
+            if (lower.includes('day')) return 'Day';
+            if (lower.includes('eve')) return 'Eve';
+            return '';
+        }
+        function getVal(row, colName, fallbackIdx) {
+            const idx = headers.indexOf(colName);
+            if (idx !== -1 && row[idx] !== undefined && row[idx] !== null && String(row[idx]).trim() !== '') {
+                return String(row[idx]).trim();
+            }
+            if (fallbackIdx !== undefined && row[fallbackIdx] !== undefined && row[fallbackIdx] !== null && String(row[fallbackIdx]).trim() !== '') {
+                return String(row[fallbackIdx]).trim();
+            }
+            return '';
+        }
+        function getOCN(row) { return getVal(row, 'OCN', 1); }
+        function getBatch(row) { return getVal(row, 'Batches', 0); }
+        function getCourseCode(row) { return getVal(row, 'C. Code', 2); }
+        function getCourseTitle(row) { return getVal(row, 'Course Title', 3); }
+        function getTeacher(row) { return getVal(row, 'Teachers’ Name', 4); }
+        function getDate(row) { return getVal(row, 'Date', 5); }
+        function getDay(row) { return getVal(row, 'Day', 6); }
+        function getTime(row) { return getVal(row, 'Time', 7); }
+
+        function getRoom1(row) { return getVal(row, 'Room 1', 8); }
+        function getRoom2(row) { return getVal(row, 'Room 2', 9); }
+        function getRoom3(row) { return getVal(row, 'Room 3', 10); }
+
+        function getRooms(row) {
+            const rooms = [];
+            const r1 = getRoom1(row);
+            const r2 = getRoom2(row);
+            const r3 = getRoom3(row);
+            if (r1) rooms.push({ room: r1, label: 'Room 1' });
+            if (r2) rooms.push({ room: r2, label: 'Room 2' });
+            if (r3) rooms.push({ room: r3, label: 'Room 3' });
+            return rooms;
+        }
+
+        // ============================================================
+        // LOAD EXCEL
+        // ============================================================
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            fileName.textContent = '📄 ' + file.name;
+            const reader = new FileReader();
+            reader.onload = function(loadEvent) {
+                try {
+                    const data = new Uint8Array(loadEvent.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    if (json.length < 2) { alert('Excel file has insufficient data.'); return; }
+                    headers = json[0].map(h => String(h).trim());
+                    rawData = json.slice(1).filter(row => row.some(cell => cell && String(cell).trim() !== ''));
+                    const batches = new Set();
+                    rawData.forEach(row => { const b = getBatch(row); if (b) batches.add(b); });
+                    batchSelect.innerHTML = '<option value="">— All —</option>';
+                    [...batches].sort().forEach(b => { batchSelect.innerHTML += `<option value="${b}">${b}</option>`; });
+                    customPanel.style.display = 'block';
+                    filterSection.style.display = 'flex';
+                    actionButtons.style.display = 'flex';
+                    generateEnvelopes();
+                } catch (err) { alert('Error reading Excel: ' + err.message); }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // ============================================================
+        // LOGO
+        // ============================================================
+        logoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                uploadedLogo = ev.target.result;
+                logoPreview.src = uploadedLogo;
+                logoPreview.classList.add('show');
+                removeLogoBtn.style.display = 'inline-block';
+                if (document.getElementById('previewGrid').children.length > 1) {
+                    generateEnvelopes();
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        removeLogoBtn.addEventListener('click', function() {
+            uploadedLogo = null;
+            logoPreview.classList.remove('show');
+            logoPreview.src = '';
+            removeLogoBtn.style.display = 'none';
+            logoInput.value = '';
+            if (document.getElementById('previewGrid').children.length > 1) {
+                generateEnvelopes();
+            }
+        });
+
+        function applyLogoSize() {
+            const sz = logoSzValue.value + 'px';
+            document.querySelectorAll('.logo-left .logo-img').forEach(el => {
+                el.style.width = sz;
+                el.style.height = sz;
+            });
+        }
+
+        // ============================================================
+        // GENERATE ENVELOPES
+        // ============================================================
+        function generateEnvelopes() {
+            const selectedBatch = batchSelect.value;
+            const selectedSession = sessionSelect.value;
+            const selectedType = courseTypeSelect.value;
+
+            let filtered = rawData.filter(row => {
+                const batch = getBatch(row);
+                const session = getSessionFromBatch(batch);
+                const code = getCourseCode(row);
+                const type = getCourseType(code);
+                if (selectedBatch && batch !== selectedBatch) return false;
+                if (selectedSession && session !== selectedSession) return false;
+                if (selectedType && type !== selectedType) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                previewGrid.innerHTML = `<div class="empty-msg">⚠️ No data found for selected filters.</div>`;
+                return;
+            }
+
+            allEnvelopes = [];
+            filtered.forEach(row => {
+                const batch = getBatch(row);
+                const session = getSessionFromBatch(batch);
+                const code = getCourseCode(row);
+                const type = getCourseType(code);
+                const ocn = getOCN(row);
+                const title = getCourseTitle(row);
+                const teacher = getTeacher(row);
+                const date = getDate(row);
+                const day = getDay(row);
+                const time = getTime(row);
+
+                const rooms = getRooms(row);
+                rooms.forEach(r => {
+                    allEnvelopes.push({
+                        batch,
+                        session,
+                        code,
+                        type,
+                        ocn,
+                        title,
+                        teacher,
+                        date,
+                        day,
+                        time,
+                        room: r.room,
+                        roomLabel: r.label,
+                        row
+                    });
+                });
+            });
+
+            if (allEnvelopes.length === 0) {
+                previewGrid.innerHTML = `<div class="empty-msg">⚠️ No room data found.</div>`;
+                return;
+            }
+
+            renderEnvelopes(allEnvelopes);
+        }
+
+        // ============================================================
+        // RENDER ENVELOPES
+        // ============================================================
+        function renderEnvelopes(envelopes) {
+            const types = [
+                { id: 'ans_eve_theory', label: 'Answer Script', session: 'Eve', type: 'Theory' },
+                { id: 'ans_eve_lab', label: 'Answer Script', session: 'Eve', type: 'Lab' },
+                { id: 'ans_day_theory', label: 'Answer Script', session: 'Day', type: 'Theory' },
+                { id: 'ans_day_lab', label: 'Answer Script', session: 'Day', type: 'Lab' },
+                { id: 'qp_eve_lab', label: 'Question Paper', session: 'Eve', type: 'Lab' },
+                { id: 'qp_eve_theory', label: 'Question Paper', session: 'Eve', type: 'Theory' },
+                { id: 'qp_day_lab', label: 'Question Paper', session: 'Day', type: 'Lab' },
+                { id: 'qp_day_theory', label: 'Question Paper', session: 'Day', type: 'Theory' },
+            ];
+
+            let html = '';
+            let hasAnyData = false;
+
+            types.forEach(t => {
+                const matches = envelopes.filter(e => e.session === t.session && e.type === t.type);
+                if (matches.length > 0) {
+                    hasAnyData = true;
+                    matches.forEach((e) => {
+                        html += buildEnvelopeCard(t, e);
+                    });
+                }
+            });
+
+            if (!hasAnyData) {
+                html = `<div class="empty-msg">⚠️ No envelopes could be generated.</div>`;
+            }
+            previewGrid.innerHTML = html;
+            setTimeout(() => { applyLogoSize(); applyLogo(); }, 50);
+        }
+
+        // ============================================================
+        // BUILD ENVELOPE CARD
+        // ============================================================
+        function buildEnvelopeCard(typeObj, item) {
+            const isQp = typeObj.label === 'Question Paper';
+
+            const h1 = headerLine1.value || '';
+            const h2 = headerLine2.value || '';
+            const h3 = headerLine3.value || '';
+            const h4 = headerLine4.value || '';
+            const h5 = headerLine5.value || '';
+
+            const fs1 = fsLine1.value + 'px';
+            const fs2 = fsLine2.value + 'px';
+            const fs3 = fsLine3.value + 'px';
+            const fs4 = fsLine4.value + 'px';
+            const fs5 = fsLine5.value + 'px';
+
+            const bold1 = document.querySelector('.bold-check[data-line="1"]').checked ? '700' : '400';
+            const bold2 = document.querySelector('.bold-check[data-line="2"]').checked ? '700' : '400';
+            const bold3 = document.querySelector('.bold-check[data-line="3"]').checked ? '700' : '400';
+            const bold4 = document.querySelector('.bold-check[data-line="4"]').checked ? '700' : '400';
+            const bold5 = document.querySelector('.bold-check[data-line="5"]').checked ? '700' : '400';
+
+            const lineStyles = [fs1, fs2, fs3, fs4, fs5];
+            const lineWeights = [bold1, bold2, bold3, bold4, bold5];
+            const lineValues = [h1, h2, h3, h4, h5];
+
+            let headerLinesHtml = '';
+            for (let i = 0; i < lineValues.length; i++) {
+                if (lineValues[i] && lineValues[i].trim() !== '') {
+                    headerLinesHtml +=
+                        `<div class="cline" style="font-size:${lineStyles[i]}; font-weight:${lineWeights[i]};">${lineValues[i]}</div>`;
+                }
+            }
+
+            const typeLabel = isQp ? '📄 QUESTION PAPER' : '📝 ANSWER SCRIPT';
+            const typeDisplay = `${typeLabel} — ${typeObj.session} ${item.type} — ${item.roomLabel}`;
+
+            const dataItems = [
+                { label: 'Batch', value: item.batch || '—' },
+                { label: 'OCN', value: item.ocn || '—' },
+                { label: 'Course Code', value: item.code || '—' },
+                { label: 'Course Title', value: item.title || '—' },
+                { label: 'Examiner', value: item.teacher || '—' },
+            ];
+
+            if (isQp) {
+                dataItems.push({ label: 'Signature', value: '_______________' });
+            } else {
+                dataItems.push({ label: 'No. of Scripts', value: '_______________' });
+            }
+
+            dataItems.push(
+                { label: 'Room No', value: item.room || '—' },
+                { label: 'Date', value: item.date || '—' },
+                { label: 'Day', value: item.day || '—' },
+                { label: 'Time', value: item.time || '—' }
+            );
+
+            let dataHtml = '';
+            dataItems.forEach(d => {
+                dataHtml += `
+                    <div class="data-item">
+                        <span class="dlabel">${d.label}</span>
+                        <span class="dvalue">${d.value}</span>
+                    </div>
+                `;
+            });
+
+            let invigilatorHtml = '';
+            if (!isQp) {
+                invigilatorHtml = `
+                    <div class="invigilator-section">
+                        <div class="invigilator-item">
+                            <span class="ilabel">Invigilator's Name:</span>
+                            <span class="ivalue">&nbsp;</span>
+                        </div>
+                        <div class="invigilator-item">
+                            <span class="ilabel">Invigilator's Phone No:</span>
+                            <span class="ivalue">&nbsp;</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let signatureHtml = '';
+            if (isQp) {
+                signatureHtml = `
+                    <div class="signature-area-qp">
+                        <div class="sig-label">Signature of Convener:</div>
+                        <div class="sig-space">&nbsp;</div>
+                        <div class="sig-note">(With date and seal)</div>
+                    </div>
+                `;
+            }
+
+            const logoHtml = uploadedLogo ? `
+                <div class="logo-left">
+                    <div class="logo-img" style="width:${logoSzValue.value}px; height:${logoSzValue.value}px;">
+                        <img src="${uploadedLogo}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" />
+                    </div>
+                </div>
+            ` : '';
+
+            return `
+                <div class="envelope-card">
+                    <div class="envelope-header no-print">
+                        <span>${typeObj.label} — ${typeObj.session} ${item.type} — ${item.roomLabel}</span>
+                        <span class="badge">${item.code || 'N/A'}</span>
+                        <button class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
+                    </div>
+                    <div class="envelope-body">
+                        <div class="a4-page">
+                            <div class="header-row">
+                                ${logoHtml}
+                                <div class="header-text">
+                                    ${headerLinesHtml}
+                                </div>
+                            </div>
+
+                            <div class="envelope-type-box">${typeDisplay}</div>
+
+                            <div class="data-grid">
+                                ${dataHtml}
+                            </div>
+
+                            ${invigilatorHtml}
+                            ${signatureHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function applyLogo() {
+            if (uploadedLogo) {
+                document.querySelectorAll('.logo-left .logo-img img').forEach(el => { el.src = uploadedLogo; });
+            }
+        }
+
+        // ============================================================
+        // GENERATE EXCEL - No Duplicates with Room Column
+        // ============================================================
+        function generateExcel() {
+            if (allEnvelopes.length === 0) {
+                alert('Please generate envelopes first!');
+                return;
+            }
+
+            // Create unique entries based on: Batch + Section + Course Code + Date + Time + Room
+            const uniqueMap = new Map();
+            allEnvelopes.forEach(e => {
+                const key = `${e.batch}|${e.roomLabel}|${e.code}|${e.date}|${e.time}|${e.room}`;
+                if (!uniqueMap.has(key)) {
+                    uniqueMap.set(key, {
+                        date: e.date || '—',
+                        day: e.day || '—',
+                        time: e.time || '—',
+                        code: e.code || '—',
+                        title: e.title || '—',
+                        ocn: e.ocn || '—',
+                        batch: e.batch || '—',
+                        teacher: e.teacher || '—',
+                        room: e.room || '—',
+                        roomLabel: e.roomLabel || '—'
+                    });
+                }
+            });
+
+            const uniqueData = Array.from(uniqueMap.values());
+
+            // Sort by Date, then Time, then Batch
+            uniqueData.sort((a, b) => {
+                if (a.date !== b.date) return a.date.localeCompare(b.date);
+                if (a.time !== b.time) return a.time.localeCompare(b.time);
+                return a.batch.localeCompare(b.batch);
+            });
+
+            // Prepare Excel data with Room column
+            const excelRows = [
+                ['Date', 'Day', 'Time', 'Course Code', 'Course Title', 'OCN', 'Batch', 'Teacher', 'Room',
+                    'Number of Copy', 'Invigilator\'s Acronyms', 'Received Sign With Date',
+                    'Submission Sign With Date', 'Remarks'
+                ]
+            ];
+
+            uniqueData.forEach(item => {
+                excelRows.push([
+                    item.date,
+                    item.day,
+                    item.time,
+                    item.code,
+                    item.title,
+                    item.ocn,
+                    item.batch,
+                    item.teacher,
+                    item.room, // Room column added here
+                    '', // Number of Copy - Blank
+                    '', // Invigilator's Acronyms - Blank
+                    '', // Received Sign With Date - Blank
+                    '', // Submission Sign With Date - Blank
+                    '' // Remarks - Blank
+                ]);
+            });
+
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(excelRows);
+
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 14 }, // Date
+                { wch: 12 }, // Day
+                { wch: 14 }, // Time
+                { wch: 16 }, // Course Code
+                { wch: 35 }, // Course Title
+                { wch: 10 }, // OCN
+                { wch: 16 }, // Batch
+                { wch: 30 }, // Teacher
+                { wch: 12 }, // Room
+                { wch: 16 }, // Number of Copy
+                { wch: 22 }, // Invigilator's Acronyms
+                { wch: 22 }, // Received Sign With Date
+                { wch: 22 }, // Submission Sign With Date
+                { wch: 16 } // Remarks
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Summary');
+            XLSX.writeFile(wb, 'Exam_Envelope_Summary.xlsx');
+        }
+
+        // ============================================================
+        // EVENTS
+        // ============================================================
+        generateBtn.addEventListener('click', generateEnvelopes);
+        batchSelect.addEventListener('change', generateEnvelopes);
+        sessionSelect.addEventListener('change', generateEnvelopes);
+        courseTypeSelect.addEventListener('change', generateEnvelopes);
+
+        [headerLine1, headerLine2, headerLine3, headerLine4, headerLine5].forEach(el => {
+            el.addEventListener('input', function() {
+                if (document.getElementById('previewGrid').children.length > 1) {
+                    generateEnvelopes();
+                }
+            });
+        });
+
+        btnEnvelope.addEventListener('click', function() {
+            previewGrid.style.display = 'grid';
+            generateEnvelopes();
+        });
+
+        btnExcel.addEventListener('click', generateExcel);
+
+        console.log('✅ Envelope & Excel Generator Ready - Room column added!');
+    </script>
+
+</body>
+</html>
