@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Envelope & Excel Generator</title>
+    <title>Envelope Generator</title>
     <style>
         /* ====== Global ====== */
         * {
@@ -13,7 +13,7 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: #f0f4f8;
+            background: #eef2f7;
             padding: 20px 15px;
             display: flex;
             flex-direction: column;
@@ -102,10 +102,6 @@
         }
         .btn-excel:hover {
             background: #15692a;
-        }
-        .btn-excel:disabled {
-            background: #999;
-            cursor: not-allowed;
         }
 
         /* ====== Customization Panel ====== */
@@ -312,7 +308,7 @@
         /* ====== Preview Grid ====== */
         .preview-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
             gap: 25px;
             width: 100%;
             max-width: 1200px;
@@ -347,31 +343,32 @@
             font-weight: 700;
         }
         .envelope-body {
-            padding: 14px 18px 12px;
+            padding: 10px 14px 10px;
         }
 
         /* ====== PORTRAIT A4 PAGE ====== */
         .envelope-body .a4-page {
             max-width: 210mm;
-            min-height: 297mm;
             margin: 0 auto;
             background: white;
-            padding: 10mm 12mm;
+            padding: 6mm 8mm;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
             position: relative;
+            min-height: auto;
         }
 
+        /* ---- HEADER ---- */
         .header-row {
             display: flex;
             align-items: flex-start;
             gap: 8px;
             margin-bottom: 6px;
             padding-bottom: 6px;
-            border-bottom: 3px double #000;
-            min-height: 70px;
+            border-bottom: 2.5px double #1e3a5f;
+            min-height: 68px;
         }
         .header-row .logo-left {
             flex-shrink: 0;
@@ -387,120 +384,174 @@
         }
         .header-row .header-text {
             flex: 1;
-            text-align: left;
+            text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding-left: 4px;
+            padding-right: 4px;
         }
         .header-row .header-text .cline {
-            color: #000;
+            color: #1e3a5f;
             padding: 1px 0;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
             line-height: 1.3;
         }
 
-        .envelope-type-box {
-            border: 3px solid #000;
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin: 4px 0 10px 0;
+        /* ---- ENVELOPE TYPE LABEL ---- */
+        .envelope-type-label {
             text-align: center;
             font-weight: 800;
+            font-size: 26px;
+            color: #1e3a5f;
+            margin: 8px 0 11px 0;
+            letter-spacing: 0.8px;
+            padding: 9px 13px;
+            border: 2px solid #1e3a5f;
+            border-radius: 6px;
+            background: #f0f5fb;
+        }
+
+        /* ---- MAIN TABLE ---- */
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 11px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .main-table td {
+            border: 1.5px solid #c5d0dc;
+            padding: 9px 15px;
+            font-size: 18px;
+            color: #000;
+            vertical-align: middle;
+        }
+        .main-table td.label {
+            font-weight: 700;
+            width: 30%;
+            white-space: nowrap;
+            background: #f5f8fc;
+            color: #1e3a5f;
+        }
+        .main-table td.value {
+            font-weight: 600;
+            width: 70%;
+            word-break: break-word;
+            background: #ffffff;
+        }
+
+        /* ---- NO. OF QUESTION PAPER ---- */
+        .qp-count-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 11px;
+            padding: 11px 15px;
+            border: 2px solid #1e3a5f;
+            border-radius: 6px;
+            background: #f8faff;
+        }
+        .qp-count-row .qp-label {
+            font-weight: 700;
+            font-size: 18px;
+            color: #1e3a5f;
+        }
+        /* ====== QP BOX - তোমার দেওয়া স্টাইল ====== */
+        .qp-count-row .qp-box {
+            font-weight: 400;
             font-size: 20px;
             color: #000;
-            background: #f5f5f5;
+            background: #ffffff;
+            border: 2px solid #1e3a5f;
+            border-radius: 5px;
+            padding: 3px 20px;
+            min-width: 24px;
+            text-align: center;
             letter-spacing: 1px;
         }
 
-        .data-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .data-item {
-            border: 2px solid #000;
-            border-radius: 6px;
-            padding: 6px 12px;
-            background: #fafafa;
+        /* ---- NO. OF ANSWER SCRIPT ---- */
+        .ans-count-row {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
-        }
-        .data-item .dlabel {
-            font-weight: 700;
-            color: #000;
-            font-size: 15px;
-            white-space: nowrap;
-            min-width: 100px;
-        }
-        .data-item .dvalue {
-            font-weight: 700;
-            color: #000;
-            font-size: 15px;
-            word-break: break-word;
-        }
-
-        .invigilator-section {
-            margin-top: 10px;
-            border-top: 2px solid #000;
-            padding-top: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .invigilator-item {
-            border: 2px solid #000;
+            margin-bottom: 11px;
+            padding: 11px 15px;
+            border: 2px solid #1e3a5f;
             border-radius: 6px;
-            padding: 6px 12px;
-            background: #fafafa;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            background: #f8faff;
         }
-        .invigilator-item .ilabel {
+        .ans-count-row .ans-label {
             font-weight: 700;
-            color: #000;
-            font-size: 15px;
-            white-space: nowrap;
-            min-width: 100px;
+            font-size: 18px;
+            color: #1e3a5f;
         }
-        .invigilator-item .ivalue {
-            font-weight: 400;
-            color: #000;
-            font-size: 15px;
-            word-break: break-word;
-            min-width: 80px;
-            border-bottom: 1px solid #999;
-            padding: 0 8px;
+        .ans-count-row .ans-line {
+            flex: 1;
+            border-bottom: 1.5px solid #999;
+            min-height: 28px;
         }
 
-        .signature-area-qp {
-            margin-top: 10px;
-            border-top: 2px solid #000;
-            padding-top: 10px;
-            text-align: center;
-            font-size: 14px;
-            color: #000;
-            font-weight: 600;
+        /* ---- BOTTOM SECTION ---- */
+        .bottom-section {
+            margin-top: 12px;
+            border-top: 2px solid #1e3a5f;
+            padding-top: 12px;
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
         }
-        .signature-area-qp .sig-label {
-            font-weight: 600;
-            color: #000;
+        .bottom-section .left-col {
+            flex: 1;
+            min-width: 180px;
+        }
+        .bottom-section .right-col {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        /* ---- Convener Signature ---- */
+        .convener-block {
+            margin-bottom: 6px;
+        }
+        .convener-block .convener-blank {
+            min-height: 26px;
+            display: block;
+        }
+        .convener-block .convener-label {
+            font-weight: 700;
+            font-size: 18px;
+            color: #1e3a5f;
+            display: block;
             margin-bottom: 2px;
         }
-        .signature-area-qp .sig-space {
-            min-height: 60px;
-            padding: 4px 0;
-        }
-        .signature-area-qp .sig-note {
+        .convener-block .convener-note {
             font-weight: 400;
-            font-size: 13px;
-            color: #555;
+            font-size: 14px;
+            color: #666;
+            display: block;
             margin-top: 2px;
+        }
+
+        /* ---- Invigilator Block ---- */
+        .invigilator-item {
+            margin-bottom: 12px;
+        }
+        .invigilator-item .inv-label {
+            font-weight: 700;
+            font-size: 18px;
+            color: #1e3a5f;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .invigilator-item .inv-line {
+            display: block;
+            border-bottom: 1.5px solid #999;
+            min-height: 28px;
         }
 
         .empty-msg {
@@ -534,30 +585,25 @@
             .custom-grid .full-width { grid-column: 1; }
             .filters { flex-direction: column; align-items: stretch; }
             .upload-section { padding: 12px; }
-            .data-item { flex-wrap: wrap; padding: 5px 8px; }
-            .data-item .dlabel { min-width: 70px; font-size: 13px; }
-            .data-item .dvalue { font-size: 13px; }
-            .invigilator-item { flex-wrap: wrap; padding: 5px 8px; }
-            .invigilator-item .ilabel { min-width: 70px; font-size: 13px; }
-            .invigilator-item .ivalue { font-size: 13px; }
-            .envelope-body .a4-page { padding: 5mm; min-height: auto; }
-            .envelope-type-box { font-size: 16px; padding: 5px 8px; }
+            .envelope-body .a4-page { padding: 5mm; }
+            .envelope-type-label { font-size: 20px; padding: 6px 9px; }
             .preview-grid { grid-template-columns: 1fr; }
             .font-control-row { flex-wrap: wrap; }
-            .signature-area-qp .sig-space { min-height: 40px; }
             .header-row { flex-wrap: wrap; gap: 4px; }
             .header-row .header-text { text-align: center; }
             .action-buttons { flex-direction: column; }
             .action-buttons button { width: 100%; }
+            .main-table td { font-size: 14px; padding: 6px 10px; }
+            .bottom-section { flex-direction: column; gap: 12px; }
         }
 
         /* ============================================================ */
-        /* ====== PRINT - ENVELOPE PORTRAIT ====== */
+        /* ====== PRINT - PORTRAIT A4 - One Room per Page ====== */
         /* ============================================================ */
         @media print {
             @page {
                 size: portrait;
-                margin: 8mm 10mm;
+                margin: 5mm 7mm;
             }
             body {
                 background: white !important;
@@ -574,100 +620,144 @@
                 padding: 0 !important;
                 margin: 0 !important;
                 max-width: 100% !important;
+                gap: 0 !important;
             }
+
             .envelope-card {
                 box-shadow: none !important;
                 border: none !important;
                 border-radius: 0 !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                page-break-after: always;
-                break-after: page;
+                page-break-after: always !important;
+                break-after: page !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
             .envelope-card:last-child {
-                page-break-after: avoid;
-                break-after: avoid;
+                page-break-after: auto !important;
+                break-after: auto !important;
             }
-            .envelope-body { padding: 0 !important; margin: 0 !important; }
+
+            .envelope-body {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
             .envelope-body .a4-page {
                 max-width: 100% !important;
-                min-height: 100vh !important;
+                min-height: auto !important;
                 height: auto !important;
-                padding: 12mm 14mm !important;
+                padding: 5mm 7mm !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
                 background: white !important;
                 display: flex !important;
                 flex-direction: column !important;
-                justify-content: space-between !important;
-                position: relative !important;
+                justify-content: flex-start !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
+
             .header-row {
                 display: flex !important;
                 align-items: flex-start !important;
                 gap: 8px !important;
-                margin-bottom: 6px !important;
-                padding-bottom: 6px !important;
-                border-bottom: 3px double #000 !important;
-                min-height: 70px !important;
+                margin-bottom: 5px !important;
+                padding-bottom: 5px !important;
+                border-bottom: 2.5px double #1e3a5f !important;
+                min-height: 65px !important;
             }
-            .header-row .logo-left {
-                flex-shrink: 0 !important;
-            }
+            .header-row .logo-left { flex-shrink: 0 !important; }
             .header-row .header-text {
                 flex: 1 !important;
-                text-align: left !important;
-                padding-left: 4px !important;
+                text-align: center !important;
+                padding-right: 4px !important;
             }
             .header-row .header-text .cline {
-                padding: 2px 0 !important;
+                padding: 1px 0 !important;
                 line-height: 1.3 !important;
             }
-            .envelope-type-box {
-                font-size: 24px !important;
-                padding: 10px 14px !important;
-                border-width: 4px !important;
+            .envelope-type-label {
+                font-size: 28px !important;
+                margin: 8px 0 11px 0 !important;
+                padding: 9px 13px !important;
+                border-width: 2px !important;
             }
-            .data-item {
-                padding: 8px 14px !important;
-                border-width: 2.5px !important;
+            .main-table td {
+                padding: 9px 15px !important;
+                font-size: 19px !important;
+                border-width: 1.5px !important;
             }
-            .data-item .dlabel {
-                font-size: 17px !important;
-                min-width: 110px !important;
+            .main-table td.label {
+                font-size: 19px !important;
+                width: 30% !important;
             }
-            .data-item .dvalue {
-                font-size: 17px !important;
+            .main-table td.value {
+                font-size: 19px !important;
             }
-            .data-grid { gap: 6px !important; }
-            .invigilator-item {
-                padding: 8px 14px !important;
-                border-width: 2.5px !important;
+            .qp-count-row {
+                padding: 10px 15px !important;
+                margin-bottom: 10px !important;
+                border-width: 2px !important;
             }
-            .invigilator-item .ilabel {
-                font-size: 17px !important;
-                min-width: 110px !important;
+            .qp-count-row .qp-label {
+                font-size: 19px !important;
             }
-            .invigilator-item .ivalue {
-                font-size: 17px !important;
+            /* ====== QP BOX - প্রিন্টেও আগের স্টাইল ====== */
+            .qp-count-row .qp-box {
+                font-weight: 400 !important;
+                font-size: 22px !important;
+                color: #000 !important;
+                background: #ffffff !important;
+                border: 2px solid #1e3a5f !important;
+                border-radius: 5px !important;
+                padding: 3px 22px !important;
+                min-width: 24px !important;
+                text-align: center !important;
+                letter-spacing: 1px !important;
             }
-            .invigilator-section { gap: 6px !important; }
-            .signature-area-qp .sig-space {
-                min-height: 80px !important;
+            .ans-count-row {
+                padding: 10px 15px !important;
+                margin-bottom: 10px !important;
+                border-width: 2px !important;
             }
-            .signature-area-qp .sig-label {
-                font-size: 17px !important;
+            .ans-count-row .ans-label {
+                font-size: 19px !important;
             }
-            .signature-area-qp .sig-note {
+            .ans-count-row .ans-line {
+                min-height: 30px !important;
+            }
+            .bottom-section {
+                margin-top: 11px !important;
+                padding-top: 11px !important;
+                gap: 18px !important;
+            }
+            .convener-block .convener-blank {
+                min-height: 28px !important;
+            }
+            .convener-block .convener-label {
+                font-size: 19px !important;
+            }
+            .convener-block .convener-note {
                 font-size: 15px !important;
+            }
+            .invigilator-item {
+                margin-bottom: 11px !important;
+            }
+            .invigilator-item .inv-label {
+                font-size: 19px !important;
+            }
+            .invigilator-item .inv-line {
+                min-height: 30px !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <h1>📨 Envelope & Excel Generator</h1>
-    <p class="subtitle">Upload Excel → Generate Envelopes or Download Excel Summary</p>
+    <h1>📨 Envelope Generator</h1>
+    <p class="subtitle">Upload Excel → Customize → Generate Envelopes (Portrait, One Room per Page)</p>
 
     <!-- Upload -->
     <div class="upload-section">
@@ -794,7 +884,7 @@
 
     <div class="footer-note">
         <strong>Note:</strong> Course Code last digit <strong>Even</strong> = Lab, <strong>Odd</strong> = Theory.<br>
-        <strong>Excel Download:</strong> Unique entries (no duplicates) with <strong>Room</strong> column included.
+        <strong>Print:</strong> Portrait A4 — Each Room = One Page.
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -943,14 +1033,21 @@
         function getRoom2(row) { return getVal(row, 'Room 2', 9); }
         function getRoom3(row) { return getVal(row, 'Room 3', 10); }
 
+        function getStudents1(row) { return getVal(row, 'No of Student R 1', 11); }
+        function getStudents2(row) { return getVal(row, 'No of Student R 2', 12); }
+        function getStudents3(row) { return getVal(row, 'No of Student R 3', 13); }
+
         function getRooms(row) {
             const rooms = [];
             const r1 = getRoom1(row);
             const r2 = getRoom2(row);
             const r3 = getRoom3(row);
-            if (r1) rooms.push({ room: r1, label: 'Room 1' });
-            if (r2) rooms.push({ room: r2, label: 'Room 2' });
-            if (r3) rooms.push({ room: r3, label: 'Room 3' });
+            const s1 = getStudents1(row);
+            const s2 = getStudents2(row);
+            const s3 = getStudents3(row);
+            if (r1) rooms.push({ room: r1, label: 'Room 1', students: s1 });
+            if (r2) rooms.push({ room: r2, label: 'Room 2', students: s2 });
+            if (r3) rooms.push({ room: r3, label: 'Room 3', students: s3 });
             return rooms;
         }
 
@@ -1062,18 +1159,9 @@
                 const rooms = getRooms(row);
                 rooms.forEach(r => {
                     allEnvelopes.push({
-                        batch,
-                        session,
-                        code,
-                        type,
-                        ocn,
-                        title,
-                        teacher,
-                        date,
-                        day,
-                        time,
-                        room: r.room,
-                        roomLabel: r.label,
+                        batch, session, code, type, ocn, title, teacher,
+                        date, day, time,
+                        room: r.room, roomLabel: r.label, students: r.students,
                         row
                     });
                 });
@@ -1091,28 +1179,12 @@
         // RENDER ENVELOPES
         // ============================================================
         function renderEnvelopes(envelopes) {
-            const types = [
-                { id: 'ans_eve_theory', label: 'Answer Script', session: 'Eve', type: 'Theory' },
-                { id: 'ans_eve_lab', label: 'Answer Script', session: 'Eve', type: 'Lab' },
-                { id: 'ans_day_theory', label: 'Answer Script', session: 'Day', type: 'Theory' },
-                { id: 'ans_day_lab', label: 'Answer Script', session: 'Day', type: 'Lab' },
-                { id: 'qp_eve_lab', label: 'Question Paper', session: 'Eve', type: 'Lab' },
-                { id: 'qp_eve_theory', label: 'Question Paper', session: 'Eve', type: 'Theory' },
-                { id: 'qp_day_lab', label: 'Question Paper', session: 'Day', type: 'Lab' },
-                { id: 'qp_day_theory', label: 'Question Paper', session: 'Day', type: 'Theory' },
-            ];
-
             let html = '';
             let hasAnyData = false;
 
-            types.forEach(t => {
-                const matches = envelopes.filter(e => e.session === t.session && e.type === t.type);
-                if (matches.length > 0) {
-                    hasAnyData = true;
-                    matches.forEach((e) => {
-                        html += buildEnvelopeCard(t, e);
-                    });
-                }
+            envelopes.forEach((e) => {
+                hasAnyData = true;
+                html += buildEnvelopeCard(e);
             });
 
             if (!hasAnyData) {
@@ -1125,9 +1197,7 @@
         // ============================================================
         // BUILD ENVELOPE CARD
         // ============================================================
-        function buildEnvelopeCard(typeObj, item) {
-            const isQp = typeObj.label === 'Question Paper';
-
+        function buildEnvelopeCard(item) {
             const h1 = headerLine1.value || '';
             const h2 = headerLine2.value || '';
             const h3 = headerLine3.value || '';
@@ -1158,66 +1228,7 @@
                 }
             }
 
-            const typeLabel = isQp ? '📄 QUESTION PAPER' : '📝 ANSWER SCRIPT';
-            const typeDisplay = `${typeLabel} — ${typeObj.session} ${item.type} — ${item.roomLabel}`;
-
-            const dataItems = [
-                { label: 'Batch', value: item.batch || '—' },
-                { label: 'OCN', value: item.ocn || '—' },
-                { label: 'Course Code', value: item.code || '—' },
-                { label: 'Course Title', value: item.title || '—' },
-                { label: 'Examiner', value: item.teacher || '—' },
-            ];
-
-            if (isQp) {
-                dataItems.push({ label: 'Signature', value: '_______________' });
-            } else {
-                dataItems.push({ label: 'No. of Scripts', value: '_______________' });
-            }
-
-            dataItems.push(
-                { label: 'Room No', value: item.room || '—' },
-                { label: 'Date', value: item.date || '—' },
-                { label: 'Day', value: item.day || '—' },
-                { label: 'Time', value: item.time || '—' }
-            );
-
-            let dataHtml = '';
-            dataItems.forEach(d => {
-                dataHtml += `
-                    <div class="data-item">
-                        <span class="dlabel">${d.label}</span>
-                        <span class="dvalue">${d.value}</span>
-                    </div>
-                `;
-            });
-
-            let invigilatorHtml = '';
-            if (!isQp) {
-                invigilatorHtml = `
-                    <div class="invigilator-section">
-                        <div class="invigilator-item">
-                            <span class="ilabel">Invigilator's Name:</span>
-                            <span class="ivalue">&nbsp;</span>
-                        </div>
-                        <div class="invigilator-item">
-                            <span class="ilabel">Invigilator's Phone No:</span>
-                            <span class="ivalue">&nbsp;</span>
-                        </div>
-                    </div>
-                `;
-            }
-
-            let signatureHtml = '';
-            if (isQp) {
-                signatureHtml = `
-                    <div class="signature-area-qp">
-                        <div class="sig-label">Signature of Convener:</div>
-                        <div class="sig-space">&nbsp;</div>
-                        <div class="sig-note">(With date and seal)</div>
-                    </div>
-                `;
-            }
+            const typeLabel = `${item.session} ${item.type} - ${item.roomLabel}`;
 
             const logoHtml = uploadedLogo ? `
                 <div class="logo-left">
@@ -1227,15 +1238,19 @@
                 </div>
             ` : '';
 
+            const studentCount = item.students || '';
+
             return `
                 <div class="envelope-card">
                     <div class="envelope-header no-print">
-                        <span>${typeObj.label} — ${typeObj.session} ${item.type} — ${item.roomLabel}</span>
-                        <span class="badge">${item.code || 'N/A'}</span>
+                        <span>${typeLabel} — ${item.code || 'N/A'}</span>
+                        <span class="badge">${item.batch || ''}</span>
                         <button class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
                     </div>
                     <div class="envelope-body">
                         <div class="a4-page">
+
+                            <!-- HEADER -->
                             <div class="header-row">
                                 ${logoHtml}
                                 <div class="header-text">
@@ -1243,14 +1258,80 @@
                                 </div>
                             </div>
 
-                            <div class="envelope-type-box">${typeDisplay}</div>
+                            <!-- ENVELOPE TYPE LABEL -->
+                            <div class="envelope-type-label">${typeLabel}</div>
 
-                            <div class="data-grid">
-                                ${dataHtml}
+                            <!-- MAIN TABLE -->
+                            <table class="main-table">
+                                <tr>
+                                    <td class="label">Batch</td>
+                                    <td class="value">${item.batch || '—'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">OCN</td>
+                                    <td class="value">${item.ocn || '—'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Course Code</td>
+                                    <td class="value">${item.code || '—'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Course Title</td>
+                                    <td class="value">${item.title || '—'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Examiner</td>
+                                    <td class="value">${item.teacher || '—'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Room No</td>
+                                    <td class="value">${item.room || '—'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Date</td>
+                                    <td class="value">${item.date || '—'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Day</td>
+                                    <td class="value">${item.day || '—'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Time</td>
+                                    <td class="value">${item.time || '—'}</td>
+                                </tr>
+                            </table>
+
+                            <!-- NO. OF QUESTION PAPER + ANSWER SCRIPT -->
+                            <div class="qp-count-row">
+                                <span class="qp-label">No. of Question Paper:</span>
+                                <span class="qp-box">${studentCount || ''}</span>
+                            </div>
+                            <div class="ans-count-row">
+                                <span class="ans-label">No. of Answer Script:</span>
+                                <span class="ans-line">&nbsp;</span>
                             </div>
 
-                            ${invigilatorHtml}
-                            ${signatureHtml}
+                            <!-- SIGNATURE SECTION -->
+                            <div class="bottom-section">
+                                <div class="left-col">
+                                    <div class="convener-block">
+                                        <span class="convener-blank">&nbsp;</span>
+                                        <span class="convener-label">Signature of Convener:</span>
+                                        <span class="convener-note">(With Date and Seal)</span>
+                                    </div>
+                                </div>
+                                <div class="right-col">
+                                    <div class="invigilator-item">
+                                        <span class="inv-label">Invigilator's Name:</span>
+                                        <span class="inv-line">&nbsp;</span>
+                                    </div>
+                                    <div class="invigilator-item">
+                                        <span class="inv-label">Invigilator's Phone No:</span>
+                                        <span class="inv-line">&nbsp;</span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -1264,7 +1345,7 @@
         }
 
         // ============================================================
-        // GENERATE EXCEL - No Duplicates with Room Column
+        // GENERATE EXCEL
         // ============================================================
         function generateExcel() {
             if (allEnvelopes.length === 0) {
@@ -1272,7 +1353,6 @@
                 return;
             }
 
-            // Create unique entries based on: Batch + Section + Course Code + Date + Time + Room
             const uniqueMap = new Map();
             allEnvelopes.forEach(e => {
                 const key = `${e.batch}|${e.roomLabel}|${e.code}|${e.date}|${e.time}|${e.room}`;
@@ -1287,67 +1367,41 @@
                         batch: e.batch || '—',
                         teacher: e.teacher || '—',
                         room: e.room || '—',
-                        roomLabel: e.roomLabel || '—'
+                        students: e.students || ''
                     });
                 }
             });
 
             const uniqueData = Array.from(uniqueMap.values());
 
-            // Sort by Date, then Time, then Batch
             uniqueData.sort((a, b) => {
                 if (a.date !== b.date) return a.date.localeCompare(b.date);
                 if (a.time !== b.time) return a.time.localeCompare(b.time);
                 return a.batch.localeCompare(b.batch);
             });
 
-            // Prepare Excel data with Room column
             const excelRows = [
                 ['Date', 'Day', 'Time', 'Course Code', 'Course Title', 'OCN', 'Batch', 'Teacher', 'Room',
-                    'Number of Copy', 'Invigilator\'s Acronyms', 'Received Sign With Date',
-                    'Submission Sign With Date', 'Remarks'
+                    'No. of Question Paper', 'No. of Answer Script', 'Invigilator\'s Acronyms',
+                    'Received Sign With Date', 'Submission Sign With Date', 'Remarks'
                 ]
             ];
 
             uniqueData.forEach(item => {
                 excelRows.push([
-                    item.date,
-                    item.day,
-                    item.time,
-                    item.code,
-                    item.title,
-                    item.ocn,
-                    item.batch,
-                    item.teacher,
-                    item.room, // Room column added here
-                    '', // Number of Copy - Blank
-                    '', // Invigilator's Acronyms - Blank
-                    '', // Received Sign With Date - Blank
-                    '', // Submission Sign With Date - Blank
-                    '' // Remarks - Blank
+                    item.date, item.day, item.time, item.code, item.title, item.ocn,
+                    item.batch, item.teacher, item.room, item.students,
+                    '', '', '', '', ''
                 ]);
             });
 
-            // Create workbook
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(excelRows);
 
-            // Set column widths
             ws['!cols'] = [
-                { wch: 14 }, // Date
-                { wch: 12 }, // Day
-                { wch: 14 }, // Time
-                { wch: 16 }, // Course Code
-                { wch: 35 }, // Course Title
-                { wch: 10 }, // OCN
-                { wch: 16 }, // Batch
-                { wch: 30 }, // Teacher
-                { wch: 12 }, // Room
-                { wch: 16 }, // Number of Copy
-                { wch: 22 }, // Invigilator's Acronyms
-                { wch: 22 }, // Received Sign With Date
-                { wch: 22 }, // Submission Sign With Date
-                { wch: 16 } // Remarks
+                { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }, { wch: 35 },
+                { wch: 10 }, { wch: 16 }, { wch: 30 }, { wch: 12 },
+                { wch: 20 }, { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 16 }
             ];
 
             XLSX.utils.book_append_sheet(wb, ws, 'Summary');
@@ -1377,7 +1431,7 @@
 
         btnExcel.addEventListener('click', generateExcel);
 
-        console.log('✅ Envelope & Excel Generator Ready - Room column added!');
+        console.log('✅ Envelope Generator Ready - Portrait A4, One Room per Page!');
     </script>
 
 </body>
